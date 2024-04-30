@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -115,16 +115,47 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
+        class_name = ''
+        name_regex = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
+        class_matched = re.match(name_regex, args)
+        obj_kwargs = {}
+        if class_matched is not None:
+            class_name = class_matched.group('name')
+            str_arguments = args[len(class_name):].strip()
+            arguments = str_arguments.split(' ')
+            str_regex = r'(?P<t_str>"([^"]|\")*")'
+            float_regex = r'(?P<t_float>[-+]?\d+\.\d+)'
+            int_regex = r'(?P<t_int>[-+]?\d+)'
+            argument_regex = '{}=({}|{}|{})'.format(
+                name_regex,
+                str_regex,
+                float_regex,
+                int_regex
+            )
+            for argument in arguments:
+                argument_match = re.fullmatch(argument_regex, argument)
+                if argument_match is not None:
+                    key_name = argument_match.group('name')
+                    str_val = argument_match.group('t_str')
+                    float_val = argument_match.group('t_float')
+                    int_val = argument_match.group('t_int')
+                    if float_val is not None:
+                        obj_kwargs[key_name] = float(float_val)
+                    if int_val is not None:
+                        obj_kwargs[key_name] = int(int_val)
+                    if str_val is not None:
+                        obj_kwargs[key_name] = str_val[1:-1].replace('_', ' ')
+        else:
+            class_name = args
+        if not class_name:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
+        new_instance = HBNBCommand.classes[class_name]()
+        new_instance.save()
         print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -319,6 +350,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
