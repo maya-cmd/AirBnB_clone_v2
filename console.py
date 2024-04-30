@@ -115,6 +115,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
+        skipped_attributes = ('id', 'created_at', 'updated_at', '__class__')
         class_name = ''
         name_regex = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
         class_matched = re.match(name_regex, args)
@@ -146,6 +147,7 @@ class HBNBCommand(cmd.Cmd):
                     if str_val is not None:
                         obj_kwargs[key_name] = str_val[1:-1].replace('_', ' ')
         else:
+
             class_name = args
         if not class_name:
             print("** class name missing **")
@@ -153,9 +155,24 @@ class HBNBCommand(cmd.Cmd):
         elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[class_name]()
+
+        if not hasattr(obj_kwargs, 'id'):
+            obj_kwargs['id'] = str(uuid.uuid4())
+        if not hasattr(obj_kwargs, 'created_at'):
+            obj_kwargs['created_at'] = str(datetime.now())
+        if not hasattr(obj_kwargs, 'updated_at'):
+            obj_kwargs['updated_at'] = str(datetime.now())
+        new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
         new_instance.save()
         print(new_instance.id)
+
+        else:
+            new_instance = HBNBCommand.classes[class_name]()
+            for key, value in obj_kwargs.items():
+                if key not in skipped_attributes:
+                    setattr(new_instance, key, value)
+            new_instance.save()
+            print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
