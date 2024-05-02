@@ -155,20 +155,22 @@ class HBNBCommand(cmd.Cmd):
         else:
 
             class_name = args
-
-        if not hasattr(obj_kwargs, 'id'):
-            obj_kwargs['id'] = str(uuid.uuid4())
-        if not hasattr(obj_kwargs, 'created_at'):
-            obj_kwargs['created_at'] = str(datetime.now())
-        if not hasattr(obj_kwargs, 'updated_at'):
-            obj_kwargs['updated_at'] = str(datetime.now())
-        
         if not class_name:
             print("** class name missing **")
             return
         elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
+        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+            if not hasattr(obj_kwargs, 'id'):
+            obj_kwargs['id'] = str(uuid.uuid4())
+        if not hasattr(obj_kwargs, 'created_at'):
+            obj_kwargs['created_at'] = str(datetime.now())
+        if not hasattr(obj_kwargs, 'updated_at'):
+            obj_kwargs['updated_at'] = str(datetime.now())
+        new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
+        new_instance.save()
+        print(new_instance.id)
 
         else:
             new_instance = HBNBCommand.classes[class_name]()
@@ -178,9 +180,6 @@ class HBNBCommand(cmd.Cmd):
             new_instance.save()
             print(new_instance.id)
 
-        new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
-        new_instance.save()
-        print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
