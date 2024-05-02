@@ -15,6 +15,7 @@ if models.storage_t == "db":
 else:
     Base = object
 
+
 class BaseModel:
     """A base class for all hbnb models"""
     if models.storage_t == "db":
@@ -58,14 +59,16 @@ class BaseModel:
         """returns a dictionary containing all keys/values of the instance"""
         newest_dict = self.__dict__.copy()
         if "created_at" in newest_dict:
-            newest_dict["created_at"] = newest_dict["created_at"].strftime(time)
+            newest_dict["created_at"] =
+            newest_dict["created_at"].strftime(time)
         if "updated_at" in newest_dict:
-            newest_dict["updated_at"] = newest_dict["updated_at"].strftime(time)
+            newest_dict["updated_at"] =
+            newest_dict["updated_at"].strftime(time)
         newest_dict["__class__"] = self.__class__.__name__
         if "_sa_instance_state" in newest_dict:
             del newest_dict["_sa_instance_state"]
         return newest_dict
-    
+
     def delete(self):
         """delete the current instance from the storage"""
         models.storage.delete(self)
