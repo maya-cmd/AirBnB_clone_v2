@@ -26,4 +26,4 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """user initialization"""
-        super().__init__(*args, **kwargs)"
+        super().__init__(*args, **kwargs)
