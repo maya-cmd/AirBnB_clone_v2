@@ -42,14 +42,14 @@ class DBStorage:
 
     def all(self, cls=None):
         """Method to query the database session that is currently on"""
-        newest_dict = {}
+        new_dict = {}
         for clss in classes:
             if cls is None or cls is classes[clss] or cls is clss:
                 objs = self.__session.query(classes[clss]).all()
                 for obj in objs:
                     key = obj.__class__.__name__ + '.' + obj.id
-                    newest_dict[key] = obj
-        return (newest_dict)
+                    new_dict[key] = obj
+        return (new_dict)
 
     def new(self, obj):
         """Method to add an object to the current database session"""
